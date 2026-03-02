@@ -1,4 +1,4 @@
--- By EchoLabs
+-- By EchoLabs upd
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -39,8 +39,16 @@ local mouse_buttons = {
 
 -- Support pour XButton1 et XButton2 (via KeyCode si l'executeur les supporte)
 local xbuttons = {}
-pcall(function() xbuttons[Enum.KeyCode.X1] = "XB1" end)
-pcall(function() xbuttons[Enum.KeyCode.X2] = "XB2" end)
+pcall(function() 
+	if Enum.KeyCode.X1 then  -- Vérification supplémentaire
+		xbuttons[Enum.KeyCode.X1] = "XB1" 
+	end
+end)
+pcall(function() 
+	if Enum.KeyCode.X2 then  -- Vérification supplémentaire
+		xbuttons[Enum.KeyCode.X2] = "XB2" 
+	end
+end)
 
 -- Convertit une valeur keybind en texte affiché
 local function keybindToText(value)
