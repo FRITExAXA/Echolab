@@ -1,4 +1,4 @@
--- By EchoLabs upd
+-- By EchoLabs
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -100,9 +100,6 @@ library.theme = {
 	itemscolor2     = Color3.fromRGB(210, 210, 210)
 }
 
--- ============================================================
--- CUSTOM NOTIFICATION SYSTEM
--- ============================================================
 function library:Notify(title, text, duration)
 	duration = duration or 3
 	
@@ -111,26 +108,30 @@ function library:Notify(title, text, duration)
 	notifContainer.Size = UDim2.fromOffset(250, 60)
 	notifContainer.Position = UDim2.fromScale(1, 0.1)
 	notifContainer.AnchorPoint = Vector2.new(1, 0)
-	notifContainer.BackgroundTransparency = 1
+	notifContainer.BackgroundTransparency = 1  -- Laisse transparent
 	notifContainer.BorderSizePixel = 0
+	notifContainer.Visible = true  -- Assure que le conteneur est visible
+	notifContainer.ZIndex = 10  -- Augmente le ZIndex de base
 	
-	-- Fond du notification
+	-- Fond du notification (AJUSTÉ)
 	local notifBg = Instance.new("Frame", notifContainer)
 	notifBg.Name = "Background"
 	notifBg.Size = UDim2.fromOffset(250, 60)
 	notifBg.Position = UDim2.fromOffset(0, 0)
 	notifBg.BackgroundColor3 = library.theme.sectorcolor
 	notifBg.BorderSizePixel = 0
-	notifBg.ZIndex = 5
+	notifBg.ZIndex = 11  -- Augmenté
+	notifBg.Visible = true
 	
-	-- Contour
-	local notifOutline = Instance.new("Frame", notifBg)
+	-- Contour (AJUSTÉ)
+	local notifOutline = Instance.new("Frame", notifContainer)  -- Changé: parent = notifContainer au lieu de notifBg
 	notifOutline.Name = "Outline"
-	notifOutline.Size = UDim2.fromOffset(250, 60)
-	notifOutline.Position = UDim2.fromOffset(0, 0)
+	notifOutline.Size = UDim2.fromOffset(252, 62)  -- Légèrement plus grand pour l'effet contour
+	notifOutline.Position = UDim2.fromOffset(-1, -1)  -- Décalé pour créer l'effet contour
 	notifOutline.BackgroundColor3 = library.theme.outlinecolor
 	notifOutline.BorderSizePixel = 0
-	notifOutline.ZIndex = 4
+	notifOutline.ZIndex = 10  -- Derrière le fond
+	notifOutline.Visible = true
 	
 	-- Top bar accent
 	local notifTop = Instance.new("Frame", notifBg)
@@ -139,7 +140,8 @@ function library:Notify(title, text, duration)
 	notifTop.Position = UDim2.fromOffset(0, 0)
 	notifTop.BackgroundColor3 = library.theme.accentcolor
 	notifTop.BorderSizePixel = 0
-	notifTop.ZIndex = 6
+	notifTop.ZIndex = 13  -- Augmenté
+	notifTop.Visible = true
 	
 	-- Titre
 	local notifTitle = Instance.new("TextLabel", notifBg)
@@ -153,7 +155,8 @@ function library:Notify(title, text, duration)
 	notifTitle.TextColor3 = library.theme.toptextcolor
 	notifTitle.TextSize = 14
 	notifTitle.TextXAlignment = Enum.TextXAlignment.Left
-	notifTitle.ZIndex = 7
+	notifTitle.ZIndex = 14  -- Augmenté
+	notifTitle.Visible = true
 	
 	-- Texte du notification
 	local notifContent = Instance.new("TextLabel", notifBg)
@@ -168,7 +171,8 @@ function library:Notify(title, text, duration)
 	notifContent.TextSize = 12
 	notifContent.TextXAlignment = Enum.TextXAlignment.Left
 	notifContent.TextWrapped = true
-	notifContent.ZIndex = 7
+	notifContent.ZIndex = 14  -- Augmenté
+	notifContent.Visible = true
 	
 	-- Animation entrée
 	local slideInTween = tweenservice:Create(notifContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
