@@ -1,4 +1,4 @@
--- By EchoLabs upd
+-- By EchoLabs
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -37,18 +37,26 @@ local mouse_buttons = {
 	[Enum.UserInputType.MouseButton3] = "MB3",
 }
 
--- Support pour XButton1 et XButton2 (via KeyCode si l'executeur les supporte)
+-- Support pour XButton1 et XButton2 (si l'executeur les supporte)
 local xbuttons = {}
-pcall(function() 
-	if Enum.KeyCode.X1 then  -- Vérification supplémentaire
-		xbuttons[Enum.KeyCode.X1] = "XB1" 
-	end
+
+-- Méthode correcte : utiliser rawget ou une tentative sécurisée
+local success1, x1 = pcall(function() 
+	-- Retourner la valeur directement, sans l'évaluer avant
+	return Enum.KeyCode.X1 
 end)
-pcall(function() 
-	if Enum.KeyCode.X2 then  -- Vérification supplémentaire
-		xbuttons[Enum.KeyCode.X2] = "XB2" 
-	end
+
+if success1 and x1 then
+	xbuttons[x1] = "XB1"
+end
+
+local success2, x2 = pcall(function() 
+	return Enum.KeyCode.X2 
 end)
+
+if success2 and x2 then
+	xbuttons[x2] = "XB2"
+end
 
 -- Convertit une valeur keybind en texte affiché
 local function keybindToText(value)
