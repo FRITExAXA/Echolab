@@ -1,30 +1,7 @@
--- By EchoLabs
+-- By EchoLabs upd
 local library = { 
 	flags = { }, 
 	items = { } 
-}
-
-library.theme = {
-    accentcolor = Color3.fromRGB(0, 255, 255),
-    accentcolor2 = Color3.fromRGB(0, 200, 200),
-    backgroundcolor = Color3.fromRGB(25, 25, 25),
-    sectorcolor = Color3.fromRGB(35, 35, 35),
-    outlinecolor = Color3.fromRGB(70, 70, 70),
-    outlinecolor2 = Color3.fromRGB(20, 20, 20),
-    font = Enum.Font.SourceSans,
-    topheight = 40,
-    topcolor = Color3.fromRGB(45, 45, 45),
-    topcolor2 = Color3.fromRGB(25, 25, 25),
-    toptextcolor = Color3.fromRGB(255, 255, 255),
-    titlesize = 18,
-    itemscolor = Color3.fromRGB(200, 200, 200),
-    itemscolor2 = Color3.fromRGB(255, 255, 255),
-    tabstextcolor = Color3.fromRGB(230, 230, 230),
-    fontsize = 15,
-    buttoncolor = Color3.fromRGB(60, 60, 60),
-    buttoncolor2 = Color3.fromRGB(40, 40, 40),
-    tilesize = 50,
-    background = "",
 }
 
 -- Services
@@ -53,15 +30,13 @@ local shorter_keycodes = {
 	["RightAlt"]     = "RALT",
 }
 
--- Boutons souris supportés (uniquement MB1, MB2, MB3)
+-- Boutons souris supportés
+-- MB4/MB5 n'existent pas dans l'API Roblox, on les ignore
 local mouse_buttons = {
 	[Enum.UserInputType.MouseButton1] = "MB1",
 	[Enum.UserInputType.MouseButton2] = "MB2",
 	[Enum.UserInputType.MouseButton3] = "MB3",
 }
-
--- Pas de support pour XButton1 et XButton2 (supprimé)
-local xbuttons = {}
 
 -- Convertit une valeur keybind en texte affiché
 local function keybindToText(value)
@@ -70,9 +45,6 @@ local function keybindToText(value)
 	end
 	if mouse_buttons[value] then
 		return "[" .. mouse_buttons[value] .. "]"
-	end
-	if xbuttons[value] then
-		return "[" .. xbuttons[value] .. "]"
 	end
 	if typeof(value) == "EnumItem" then
 		return "[" .. (shorter_keycodes[value.Name] or value.Name) .. "]"
@@ -87,10 +59,6 @@ local function inputMatchesKeybind(input, value)
 	if mouse_buttons[value] then
 		return input.UserInputType == value
 	end
-	-- XButton (KeyCode) - toujours false car xbuttons est vide
-	if xbuttons[value] then
-		return input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == value
-	end
 	-- Touche clavier
 	if typeof(value) == "EnumItem" then
 		return input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == value
@@ -103,14 +71,34 @@ local function inputToKeybindValue(input)
 	if mouse_buttons[input.UserInputType] then
 		return input.UserInputType
 	elseif input.UserInputType == Enum.UserInputType.Keyboard then
-		-- Vérifier si c'est un XButton (toujours false)
-		if xbuttons[input.KeyCode] then
-			return input.KeyCode
-		end
 		return input.KeyCode
 	end
 	return "None"
 end
+
+library.theme = {
+	fontsize        = 15,
+	titlesize       = 18,
+	font            = Enum.Font.Code,
+	background      = "rbxassetid://5553946656",
+	tilesize        = 90,
+	backgroundcolor = Color3.fromRGB(20, 20, 20),
+	tabstextcolor   = Color3.fromRGB(240, 240, 240),
+	bordercolor     = Color3.fromRGB(60, 60, 60),
+	accentcolor     = Color3.fromRGB(28, 56, 139),
+	accentcolor2    = Color3.fromRGB(16, 31, 78),
+	outlinecolor    = Color3.fromRGB(60, 60, 60),
+	outlinecolor2   = Color3.fromRGB(0, 0, 0),
+	sectorcolor     = Color3.fromRGB(30, 30, 30),
+	toptextcolor    = Color3.fromRGB(255, 255, 255),
+	topheight       = 48,
+	topcolor        = Color3.fromRGB(30, 30, 30),
+	topcolor2       = Color3.fromRGB(30, 30, 30),
+	buttoncolor     = Color3.fromRGB(49, 49, 49),
+	buttoncolor2    = Color3.fromRGB(39, 39, 39),
+	itemscolor      = Color3.fromRGB(200, 200, 200),
+	itemscolor2     = Color3.fromRGB(210, 210, 210)
+}
 
 -- ============================================================
 -- CUSTOM NOTIFICATION SYSTEM
@@ -1131,75 +1119,72 @@ function library:CreateWindow(name, size, hidebutton)
 				function toggle:Get() return toggle.value end
 				toggle:Set(toggle.default)
 
--- ============================================================
--- toggle:AddKeybind (avec support souris MB1-MB5)
--- ============================================================
-function toggle:AddKeybind(default, flag)
-	local keybind = { }
-	keybind.default = default or "None"
-	keybind.value   = keybind.default
-	keybind.flag    = flag or ((toggle.text or "") .. tostring(#toggle.Items:GetChildren()))
+				-- ============================================================
+				-- toggle:AddKeybind (avec support souris MB1-MB5)
+				-- ============================================================
+				function toggle:AddKeybind(default, flag)
+					local keybind = { }
+					keybind.default = default or "None"
+					keybind.value   = keybind.default
+					keybind.flag    = flag or ((toggle.text or "") .. tostring(#toggle.Items:GetChildren()))
 
-	local displayText = keybindToText(keybind.default)
-	local kbSize = textservice:GetTextSize(displayText, 15, window.theme.font, Vector2.new(2000, 2000))
+					local displayText = keybindToText(keybind.default)
+					local kbSize = textservice:GetTextSize(displayText, 15, window.theme.font, Vector2.new(2000, 2000))
 
-	keybind.Main = Instance.new("TextButton", toggle.Items)
-	keybind.Main.Name = "keybind"
-	keybind.Main.BackgroundTransparency = 1
-	keybind.Main.BorderSizePixel = 0
-	keybind.Main.ZIndex = 5
-	keybind.Main.Size = UDim2.fromOffset(kbSize.X + 2, kbSize.Y - 7)
-	keybind.Main.Text = displayText
-	keybind.Main.Font = window.theme.font
-	keybind.Main.TextColor3 = Color3.fromRGB(136, 136, 136)
-	keybind.Main.TextSize = 15
-	keybind.Main.TextXAlignment = Enum.TextXAlignment.Right
-	keybind.Main.MouseButton1Down:Connect(function()
-		keybind.Main.Text = "[...]"
-		keybind.Main.TextColor3 = window.theme.accentcolor
-	end)
-	updateevent.Event:Connect(function(theme)
-		keybind.Main.Font = theme.font
-		keybind.Main.TextColor3 = keybind.Main.Text == "[...]" and theme.accentcolor or Color3.fromRGB(136, 136, 136)
-	end)
+					keybind.Main = Instance.new("TextButton", toggle.Items)
+					keybind.Main.Name = "keybind"
+					keybind.Main.BackgroundTransparency = 1
+					keybind.Main.BorderSizePixel = 0
+					keybind.Main.ZIndex = 5
+					keybind.Main.Size = UDim2.fromOffset(kbSize.X + 2, kbSize.Y - 7)
+					keybind.Main.Text = displayText
+					keybind.Main.Font = window.theme.font
+					keybind.Main.TextColor3 = Color3.fromRGB(136, 136, 136)
+					keybind.Main.TextSize = 15
+					keybind.Main.TextXAlignment = Enum.TextXAlignment.Right
+					keybind.Main.MouseButton1Down:Connect(function()
+						keybind.Main.Text = "[...]"
+						keybind.Main.TextColor3 = window.theme.accentcolor
+					end)
+					updateevent.Event:Connect(function(theme)
+						keybind.Main.Font = theme.font
+						keybind.Main.TextColor3 = keybind.Main.Text == "[...]" and theme.accentcolor or Color3.fromRGB(136, 136, 136)
+					end)
 
-	if keybind.flag and keybind.flag ~= "" then
-		library.flags[keybind.flag] = keybind.default
-	end
+					if keybind.flag and keybind.flag ~= "" then
+						library.flags[keybind.flag] = keybind.default
+					end
 
-	function keybind:Set(value)
-		keybind.value = value
-		keybind.Main.Text = keybindToText(value)
-		if keybind.flag and keybind.flag ~= "" then
-			library.flags[keybind.flag] = value
-		end
-	end
+					function keybind:Set(value)
+						keybind.value = value
+						keybind.Main.Text = keybindToText(value)
+						if keybind.flag and keybind.flag ~= "" then
+							library.flags[keybind.flag] = value
+						end
+					end
 
-	function keybind:Get() return keybind.value end
+					function keybind:Get() return keybind.value end
 
-	uis.InputBegan:Connect(function(input, gameProcessed)
-		-- Pour les boutons souris, on ignore gameProcessed (sinon on ne peut pas les utiliser sur l'UI)
-		local isMouseButton = (input.UserInputType == Enum.UserInputType.MouseButton1 or 
-							  input.UserInputType == Enum.UserInputType.MouseButton2 or
-							  input.UserInputType == Enum.UserInputType.MouseButton3)
-		local shouldProcess = (not gameProcessed) or isMouseButton
-		
-		if shouldProcess then
-			-- Mode écoute : on accepte clavier ET souris
-			keybind.Main.TextColor3 = Color3.fromRGB(136, 136, 136)
-			local v = inputToKeybindValue(input)
-			keybind:Set(v)
-		else
-			-- Mode déclenchement toggle
-			if inputMatchesKeybind(input, keybind.value) then
-				toggle:Set(not toggle.CheckedFrame.Visible)
-			end
-		end
-	end)
+					uis.InputBegan:Connect(function(input, gameProcessed)
+						if not gameProcessed then
+							if keybind.Main.Text == "[...]" then
+								-- Mode écoute : on accepte clavier ET souris
+								keybind.Main.TextColor3 = Color3.fromRGB(136, 136, 136)
+								local v = inputToKeybindValue(input)
+								keybind:Set(v)
+							else
+								-- Mode déclenchement toggle
+								if inputMatchesKeybind(input, keybind.value) then
+									toggle:Set(not toggle.CheckedFrame.Visible)
+								end
+							end
+						end
+					end)
 
-	table.insert(library.items, keybind)
-	return keybind
-end
+					table.insert(library.items, keybind)
+					return keybind
+				end
+
 				-- ============================================================
 				-- toggle:AddDropdown
 				-- ============================================================
@@ -2622,91 +2607,88 @@ end
 				return colorpicker
 			end
 
--- ================================================================
--- AddKeybind (sector level) — support clavier + MB1-MB5
--- ================================================================
-function sector:AddKeybind(text, default, newkeycallback, callback, flag)
-	local keybind = { }
-	keybind.text           = text or ""
-	keybind.default        = default or "None"
-	keybind.callback       = callback or function() end
-	keybind.newkeycallback = newkeycallback or function(key) end
-	keybind.flag           = flag or text or ""
-	keybind.value          = keybind.default
+			-- ================================================================
+			-- AddKeybind (sector level) — support clavier + MB1-MB5
+			-- ================================================================
+			function sector:AddKeybind(text, default, newkeycallback, callback, flag)
+				local keybind = { }
+				keybind.text           = text or ""
+				keybind.default        = default or "None"
+				keybind.callback       = callback or function() end
+				keybind.newkeycallback = newkeycallback or function(key) end
+				keybind.flag           = flag or text or ""
+				keybind.value          = keybind.default
 
-	keybind.Main = Instance.new("TextLabel", sector.Items)
-	keybind.Main.BackgroundTransparency = 1
-	keybind.Main.Size = UDim2.fromOffset(156, 10)
-	keybind.Main.ZIndex = 4
-	keybind.Main.Font = window.theme.font
-	keybind.Main.Text = keybind.text
-	keybind.Main.TextColor3 = window.theme.itemscolor
-	keybind.Main.TextSize = 15
-	keybind.Main.TextStrokeTransparency = 1
-	keybind.Main.TextXAlignment = Enum.TextXAlignment.Left
-	updateevent.Event:Connect(function(theme)
-		keybind.Main.Font = theme.font
-		keybind.Main.TextColor3 = theme.itemscolor
-	end)
+				keybind.Main = Instance.new("TextLabel", sector.Items)
+				keybind.Main.BackgroundTransparency = 1
+				keybind.Main.Size = UDim2.fromOffset(156, 10)
+				keybind.Main.ZIndex = 4
+				keybind.Main.Font = window.theme.font
+				keybind.Main.Text = keybind.text
+				keybind.Main.TextColor3 = window.theme.itemscolor
+				keybind.Main.TextSize = 15
+				keybind.Main.TextStrokeTransparency = 1
+				keybind.Main.TextXAlignment = Enum.TextXAlignment.Left
+				updateevent.Event:Connect(function(theme)
+					keybind.Main.Font = theme.font
+					keybind.Main.TextColor3 = theme.itemscolor
+				end)
 
-	keybind.Bind = Instance.new("TextButton", keybind.Main)
-	keybind.Bind.Name = "keybind"
-	keybind.Bind.BackgroundTransparency = 1
-	keybind.Bind.BorderColor3 = window.theme.outlinecolor
-	keybind.Bind.ZIndex = 5
-	keybind.Bind.BorderSizePixel = 0
-	keybind.Bind.Position = UDim2.fromOffset(sector.Main.Size.X.Offset - 10, 0)
-	keybind.Bind.Font = window.theme.font
-	keybind.Bind.TextColor3 = Color3.fromRGB(136, 136, 136)
-	keybind.Bind.TextSize = 15
-	keybind.Bind.TextXAlignment = Enum.TextXAlignment.Right
-	keybind.Bind.MouseButton1Down:Connect(function()
-		keybind.Bind.Text = "[...]"
-		keybind.Bind.TextColor3 = window.theme.accentcolor
-	end)
-	updateevent.Event:Connect(function(theme)
-		keybind.Bind.BorderColor3 = theme.outlinecolor
-		keybind.Bind.Font = theme.font
-	end)
+				keybind.Bind = Instance.new("TextButton", keybind.Main)
+				keybind.Bind.Name = "keybind"
+				keybind.Bind.BackgroundTransparency = 1
+				keybind.Bind.BorderColor3 = window.theme.outlinecolor
+				keybind.Bind.ZIndex = 5
+				keybind.Bind.BorderSizePixel = 0
+				keybind.Bind.Position = UDim2.fromOffset(sector.Main.Size.X.Offset - 10, 0)
+				keybind.Bind.Font = window.theme.font
+				keybind.Bind.TextColor3 = Color3.fromRGB(136, 136, 136)
+				keybind.Bind.TextSize = 15
+				keybind.Bind.TextXAlignment = Enum.TextXAlignment.Right
+				keybind.Bind.MouseButton1Down:Connect(function()
+					keybind.Bind.Text = "[...]"
+					keybind.Bind.TextColor3 = window.theme.accentcolor
+				end)
+				updateevent.Event:Connect(function(theme)
+					keybind.Bind.BorderColor3 = theme.outlinecolor
+					keybind.Bind.Font = theme.font
+				end)
 
-	if keybind.flag and keybind.flag ~= "" then library.flags[keybind.flag] = keybind.default end
+				if keybind.flag and keybind.flag ~= "" then library.flags[keybind.flag] = keybind.default end
 
-	function keybind:Set(value)
-		keybind.value = value
-		keybind.Bind.Text = keybindToText(value)
-		local sz = textservice:GetTextSize(keybind.Bind.Text, keybind.Bind.TextSize, keybind.Bind.Font, Vector2.new(2000, 2000))
-		keybind.Bind.Size = UDim2.fromOffset(sz.X, sz.Y)
-		keybind.Bind.Position = UDim2.fromOffset(sector.Main.Size.X.Offset - 10 - keybind.Bind.AbsoluteSize.X, 0)
-		if keybind.flag and keybind.flag ~= "" then library.flags[keybind.flag] = value end
-		pcall(keybind.newkeycallback, value)
-	end
-	keybind:Set(keybind.default)
+				function keybind:Set(value)
+					keybind.value = value
+					keybind.Bind.Text = keybindToText(value)
+					local sz = textservice:GetTextSize(keybind.Bind.Text, keybind.Bind.TextSize, keybind.Bind.Font, Vector2.new(2000, 2000))
+					keybind.Bind.Size = UDim2.fromOffset(sz.X, sz.Y)
+					keybind.Bind.Position = UDim2.fromOffset(sector.Main.Size.X.Offset - 10 - keybind.Bind.AbsoluteSize.X, 0)
+					if keybind.flag and keybind.flag ~= "" then library.flags[keybind.flag] = value end
+					pcall(keybind.newkeycallback, value)
+				end
+				keybind:Set(keybind.default)
 
-	function keybind:Get() return keybind.value end
+				function keybind:Get() return keybind.value end
 
-	uis.InputBegan:Connect(function(input, gameProcessed)
-		-- Pour les boutons souris, on ignore gameProcessed (sinon on ne peut pas les utiliser sur l'UI)
-		local isMouseButton = (input.UserInputType == Enum.UserInputType.MouseButton1 or 
-							  input.UserInputType == Enum.UserInputType.MouseButton2 or
-							  input.UserInputType == Enum.UserInputType.MouseButton3)
-		local shouldProcess = (not gameProcessed) or isMouseButton
-		
-		if shouldProcess then
-			-- Mode écoute : clavier + souris MB1-MB5
-			keybind.Bind.TextColor3 = Color3.fromRGB(136, 136, 136)
-			keybind:Set(inputToKeybindValue(input))
-		else
-			-- Mode déclenchement callback
-			if inputMatchesKeybind(input, keybind.value) then
-				pcall(keybind.callback)
+				uis.InputBegan:Connect(function(input, gameProcessed)
+					if not gameProcessed then
+						if keybind.Bind.Text == "[...]" then
+							-- Mode écoute : clavier + souris MB1-MB5
+							keybind.Bind.TextColor3 = Color3.fromRGB(136, 136, 136)
+							keybind:Set(inputToKeybindValue(input))
+						else
+							-- Mode déclenchement callback
+							if inputMatchesKeybind(input, keybind.value) then
+								pcall(keybind.callback)
+							end
+						end
+					end
+				end)
+
+				sector:FixSize()
+				table.insert(library.items, keybind)
+				return keybind
 			end
-		end
-	end)
 
-	sector:FixSize()
-	table.insert(library.items, keybind)
-	return keybind
-end
 			-- ================================================================
 			-- AddDropdown (sector level)
 			-- ================================================================
@@ -3175,3 +3157,5 @@ end
 
 	return window
 end
+
+return library
