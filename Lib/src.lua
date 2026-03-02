@@ -1,7 +1,30 @@
--- By EchoLabs upd
+-- By EchoLabs
 local library = { 
 	flags = { }, 
 	items = { } 
+}
+
+library.theme = {
+    accentcolor = Color3.fromRGB(0, 255, 255),
+    accentcolor2 = Color3.fromRGB(0, 200, 200),
+    backgroundcolor = Color3.fromRGB(25, 25, 25),
+    sectorcolor = Color3.fromRGB(35, 35, 35),
+    outlinecolor = Color3.fromRGB(70, 70, 70),
+    outlinecolor2 = Color3.fromRGB(20, 20, 20),
+    font = Enum.Font.SourceSans,
+    topheight = 40,
+    topcolor = Color3.fromRGB(45, 45, 45),
+    topcolor2 = Color3.fromRGB(25, 25, 25),
+    toptextcolor = Color3.fromRGB(255, 255, 255),
+    titlesize = 18,
+    itemscolor = Color3.fromRGB(200, 200, 200),
+    itemscolor2 = Color3.fromRGB(255, 255, 255),
+    tabstextcolor = Color3.fromRGB(230, 230, 230),
+    fontsize = 15,
+    buttoncolor = Color3.fromRGB(60, 60, 60),
+    buttoncolor2 = Color3.fromRGB(40, 40, 40),
+    tilesize = 50,
+    background = "",
 }
 
 -- Services
