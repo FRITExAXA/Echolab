@@ -1,4 +1,4 @@
--- By EchoLabs
+-- By EchoLabs upd
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -30,33 +30,15 @@ local shorter_keycodes = {
 	["RightAlt"]     = "RALT",
 }
 
--- Boutons souris supportés
+-- Boutons souris supportés (uniquement MB1, MB2, MB3)
 local mouse_buttons = {
 	[Enum.UserInputType.MouseButton1] = "MB1",
 	[Enum.UserInputType.MouseButton2] = "MB2",
 	[Enum.UserInputType.MouseButton3] = "MB3",
 }
 
--- Support pour XButton1 et XButton2 (si l'executeur les supporte)
+-- Pas de support pour XButton1 et XButton2 (supprimé)
 local xbuttons = {}
-
--- Méthode correcte : utiliser rawget ou une tentative sécurisée
-local success1, x1 = pcall(function() 
-	-- Retourner la valeur directement, sans l'évaluer avant
-	return Enum.KeyCode.X1 
-end)
-
-if success1 and x1 then
-	xbuttons[x1] = "XB1"
-end
-
-local success2, x2 = pcall(function() 
-	return Enum.KeyCode.X2 
-end)
-
-if success2 and x2 then
-	xbuttons[x2] = "XB2"
-end
 
 -- Convertit une valeur keybind en texte affiché
 local function keybindToText(value)
@@ -82,7 +64,7 @@ local function inputMatchesKeybind(input, value)
 	if mouse_buttons[value] then
 		return input.UserInputType == value
 	end
-	-- XButton (KeyCode)
+	-- XButton (KeyCode) - toujours false car xbuttons est vide
 	if xbuttons[value] then
 		return input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == value
 	end
@@ -98,7 +80,7 @@ local function inputToKeybindValue(input)
 	if mouse_buttons[input.UserInputType] then
 		return input.UserInputType
 	elseif input.UserInputType == Enum.UserInputType.Keyboard then
-		-- Vérifier si c'est un XButton
+		-- Vérifier si c'est un XButton (toujours false)
 		if xbuttons[input.KeyCode] then
 			return input.KeyCode
 		end
@@ -106,30 +88,6 @@ local function inputToKeybindValue(input)
 	end
 	return "None"
 end
-
-library.theme = {
-	fontsize        = 15,
-	titlesize       = 18,
-	font            = Enum.Font.Code,
-	background      = "rbxassetid://5553946656",
-	tilesize        = 90,
-	backgroundcolor = Color3.fromRGB(20, 20, 20),
-	tabstextcolor   = Color3.fromRGB(240, 240, 240),
-	bordercolor     = Color3.fromRGB(60, 60, 60),
-	accentcolor     = Color3.fromRGB(28, 56, 139),
-	accentcolor2    = Color3.fromRGB(16, 31, 78),
-	outlinecolor    = Color3.fromRGB(60, 60, 60),
-	outlinecolor2   = Color3.fromRGB(0, 0, 0),
-	sectorcolor     = Color3.fromRGB(30, 30, 30),
-	toptextcolor    = Color3.fromRGB(255, 255, 255),
-	topheight       = 48,
-	topcolor        = Color3.fromRGB(30, 30, 30),
-	topcolor2       = Color3.fromRGB(30, 30, 30),
-	buttoncolor     = Color3.fromRGB(49, 49, 49),
-	buttoncolor2    = Color3.fromRGB(39, 39, 39),
-	itemscolor      = Color3.fromRGB(200, 200, 200),
-	itemscolor2     = Color3.fromRGB(210, 210, 210)
-}
 
 -- ============================================================
 -- CUSTOM NOTIFICATION SYSTEM
